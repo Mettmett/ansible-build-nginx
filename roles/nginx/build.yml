@@ -1,0 +1,178 @@
+---
+# roles/nginx/build.yml
+
+- name: (sys) update host apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: (sys) install sys tools
+  apt:
+    pkg:
+      - tar
+      - unzip
+      - curl
+      - git
+      - rsync
+    state: present
+    install_recommends: no
+
+- name: (sys) install build tools
+  apt:
+    name: build-essential
+    state: present
+    install_recommends: no
+
+- name: (sys) install needed libs
+  apt:
+    pkg:
+      - libgeoip-dev
+      - libxslt1-dev
+      - libpcre3
+      - libpcre3-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libssl-dev
+    state: present
+    install_recommends: no
+
+- name: (build) cleaning old sources
+  shell: |
+    rm -fr /usr/src/nginx*
+    rm -fr /usr/src/openssl*
+    rm -fr /usr/src/ngx_brotli
+
+- name: TODO (build) download latest nginx
+# latest_nginx=$(curl -L http://nginx.org/en/download.html | egrep -o "nginx\-[0-9.]+\.tar[.a-z]*" | head -n 1)
+# (curl -fLRO "http://nginx.org/download/${latest_nginx}" && tar -xaf "${latest_nginx}") &
+
+- name: TODO (build) download latest OpenSSL
+# git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable
+
+- name: TODO (build) download latest naxsi
+# git clone https://github.com/nbs-system/naxsi.git --branch master
+
+- name: TODO (build) download latest Brotli
+# git clone https://github.com/google/ngx_brotli
+# cd ngx_brotli
+# git submodule update --init
+
+- name: TODO (build) download latest nginx module headers_more
+# (curl -fLRO "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz" && tar -xaf "v0.33.tar.gz") &
+
+- name: TODO (build) configure and build nginx, make and install
+# cd /usr/src
+# cd nginx-*
+# ./configure --with-openssl=/usr/src/openssl --with-openssl-opt=enable-tls1_3 --with-ld-opt=-lrt \
+# $ngx_naxsi \
+# --http-client-body-temp-path=/usr/local/etc/nginx/body \
+# --http-fastcgi-temp-path=/usr/local/etc/nginx/fastcgi \
+# --http-proxy-temp-path=/usr/local/etc/nginx/proxy \
+# --http-scgi-temp-path=/usr/local/etc/nginx/scgi \
+# --http-uwsgi-temp-path=/usr/local/etc/nginx/uwsgi \
+# --user=www-data \
+# --group=www-data \
+# --prefix=/etc/nginx \
+# --error-log-path=/var/log/nginx/error.log \
+# --http-log-path=/var/log/nginx/access.log \
+# --sbin-path=/usr/sbin/nginx \
+# --conf-path=/etc/nginx/nginx.conf \
+# --with-pcre-jit \
+# --with-http_v2_module \
+# --with-debug \
+# --with-http_stub_status_module \
+# --with-http_realip_module \
+# --with-http_addition_module \
+# --with-http_dav_module \
+# --with-http_gzip_static_module \
+# --with-http_sub_module \
+# --with-http_xslt_module \
+# --with-file-aio \
+# --with-threads \
+# --with-http_ssl_module \
+# --with-http_geoip_module \
+# --add-module=../headers-more-nginx-module-0.33 \
+# --add-module=../ngx_brotli
+# --add-module=../naxsi/naxsi_src/
+
+# make -j $(nproc)
+# make install
+
+- name: TODO (build) Adding some Naxsi core rules from sources
+  copy:
+    src: /usr/src/naxsi/naxsi_config/naxsi_core.rules
+    dest: /etc/nginx/naxsi_core.rules
+    owner: root
+    group: root
+    mode: u+rw,g-wx,o-wx
+
+- name: (sys) remove previous systemd unit file if exists
+  file:
+    path: /lib/systemd/system/nginx.service
+    state: absent
+
+- name: (sys) installing systemd unit
+  template:
+    src: "{{ lookup('file'), {{ playbook_dir }}/templates/nginx.service.j2') }}"
+    dest: /lib/systemd/system/nginx.service
+    owner: root
+    group: root
+    mode: a+x
+
+- name: (sys) enabling nginx systemd unit file
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no
+
+- name: (sys) install logrotate
+  apt:
+    name: logrotate
+    state: present
+    install_recommends: no
+
+- name: (sys) remove previous nginx logrotate configuration file if exists
+  file:
+    path: /etc/logrotate/nginx
+    state: absent
+
+- name: (sys) installing our nginx logrotate configuration
+  template:
+    src: "{{ lookup('file'), {{ playbook_dir }}/templates/logrotate.nginx.j2') }}"
+    dest: /etc/logrotate/nginx
+    owner: root
+    group: root
+    mode: u+rw,g-wx,o-wx
+
+- name: (sys) installing our nginx configuration
+  template:
+    src: "{{ lookup('file'), {{ playbook_dir }}/templates/nginx.conf.j2') }}"
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: u+rw,g-wx,o-wx
+
+- name: (sys) create needed folders for nginx configuration
+  file:
+    path: /etc/nginx/{{ items }}
+    state: directory
+    mode: '0755'
+  with_items:
+    - conf.d
+    - sites-available
+    - sites-enabled
+
+- name: (sys) create cache folder for nginx
+  file:
+    path: /usr/local/etc/nginx
+    state: directory
+    mode: '0755'
+
+- name: (sys) start nginx to the moon
+  systemd:
+    name: nginx
+    state: restarted
+    dameon_reload: yes
+    
+- name: (sys) cleaning sources
+  shell: rm /usr/src/*.tar.gz
