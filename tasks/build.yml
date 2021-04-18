@@ -108,70 +108,70 @@
     register: nginx_configure
 
   - name: (build) make nginx sources great again
-    shell: make && make install
+    shell: "make && make install"
     args:
       chdir: "{{ nginx_source.dest }}"
     when: nginx_configure|changed
 
   - name: (build) Adding some Naxsi core rules from sources
     copy:
-      src: /usr/src/naxsi/naxsi_config/naxsi_core.rules
-      dest: /etc/nginx/naxsi_core.rules
-      owner: root
-      group: root
+      src: "/usr/src/naxsi/naxsi_config/naxsi_core.rules"
+      dest: "/etc/nginx/naxsi_core.rules"
+      owner: "root"
+      group: "root"
       mode: u+rw,g-wx,o-wx
 
   - name: (sys) remove previous systemd unit file if exists
     file:
-      path: /lib/systemd/system/nginx.service
+      path: "/lib/systemd/system/nginx.service"
       state: absent
 
   - name: (sys) installing systemd unit
     template:
       src: "{{ lookup('file'), {{ playbook_dir }}/templates/nginx.service.j2') }}"
-      dest: /lib/systemd/system/nginx.service
-      owner: root
-      group: root
+      dest: "/lib/systemd/system/nginx.service"
+      owner: "root"
+      group: "root"
       mode: a+x
 
   - name: (sys) enabling nginx systemd unit file
     systemd:
-      name: nginx
+      name: "nginx"
       enabled: yes
       masked: no
 
   - name: (sys) install logrotate
     apt:
-      name: logrotate
+      name: "logrotate"
       state: present
       install_recommends: no
 
   - name: (sys) remove previous nginx logrotate configuration file if exists
     file:
-      path: /etc/logrotate/nginx
+      path: "/etc/logrotate/nginx"
       state: absent
 
   - name: (sys) installing our nginx logrotate configuration
     template:
       src: "{{ lookup('file'), {{ playbook_dir }}/templates/logrotate.nginx.j2') }}"
-      dest: /etc/logrotate/nginx
-      owner: root
-      group: root
+      dest: "/etc/logrotate/nginx"
+      owner: "root"
+      group: "root"
       mode: u+rw,g-wx,o-wx
 
   - name: (sys) installing our nginx configuration
     template:
       src: "{{ lookup('file'), {{ playbook_dir }}/templates/nginx.conf.j2') }}"
-      dest: /etc/nginx/nginx.conf
-      owner: root
-      group: root
+      dest: "/etc/nginx/nginx.conf"
+      owner: "root"
+      group: "root"
       mode: u+rw,g-wx,o-wx
 
   - name: (sys) create needed folders for nginx configuration
     file:
-      path: /etc/nginx/{{ items }}
+      path: "/etc/nginx/{{ items }}"
       state: directory
-      mode: '0755'
+      mode: "0755"
     with_items:
       - conf.d
       - sites-available
@@ -179,15 +179,15 @@
 
   - name: (sys) create cache folder for nginx
     file:
-      path: /usr/local/etc/nginx
+      path: "/usr/local/etc/nginx"
       state: directory
-      mode: '0755'
+      mode: "0755"
 
   - name: (sys) start nginx to the moon
     systemd:
-      name: nginx
+      name: "nginx"
       state: restarted
       dameon_reload: yes
       
   - name: (sys) cleaning sources
-    shell: rm /usr/src/*.tar.gz
+    shell: "rm /usr/src/*.tar.gz"
