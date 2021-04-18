@@ -46,11 +46,17 @@
 # latest_nginx=$(curl -L http://nginx.org/en/download.html | egrep -o "nginx\-[0-9.]+\.tar[.a-z]*" | head -n 1)
 # (curl -fLRO "http://nginx.org/download/${latest_nginx}" && tar -xaf "${latest_nginx}") &
 
-- name: TODO (build) download latest OpenSSL
-# git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable
+- name: (build) download latest OpenSSL
+  git:
+    repo: 'https://github.com/openssl/openssl.git'
+    dest: /usr/src/openssl
+    version: OpenSSL_1_1_1-stable
 
-- name: TODO (build) download latest naxsi
-# git clone https://github.com/nbs-system/naxsi.git --branch master
+- name: (build) download latest naxsi
+  git:
+    repo: 'https://github.com/nbs-system/naxsi.git'
+    dest: /usr/src/naxsi
+    version: master
 
 - name: TODO (build) download latest Brotli
 # git clone https://github.com/google/ngx_brotli
