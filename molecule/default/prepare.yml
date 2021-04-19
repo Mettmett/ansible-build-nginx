@@ -1,6 +1,6 @@
 ---
 
-- name: (sys) install python3 on hosts
+- name: (sys) install python3 on hosts if needed
   hosts: all
   tasks:
     - name: python3-minimal for ansible

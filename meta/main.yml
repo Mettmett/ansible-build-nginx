@@ -1,0 +1,18 @@
+---
+
+galaxy_info:
+  author: Julien HOMMET
+  description: Ansible role to build nginx from sources, with few modules to be the best
+  license: CC BY-NC-ND
+
+  min_ansible_version: 2.9
+
+  role_name: build-nginx
+
+  platforms:
+    - name: Debian
+      versions:
+        - 9
+        - 10
+
+  dependencies: []

@@ -1,6 +1,8 @@
 ---
 
-- name: (ansible) apply role on test env
-  hosts: testshost
-  roles:
-    - build
+- name: Converge
+  hosts: all
+  tasks:
+    - name: (ansible) apply role on test env
+      include_role:
+        name: build-nginx
