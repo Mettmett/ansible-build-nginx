@@ -1,0 +1,6 @@
+---
+
+- name: (ansible) apply role on test env
+  hosts: testshost
+  roles:
+    - build

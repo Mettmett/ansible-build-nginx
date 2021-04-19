@@ -1,0 +1,8 @@
+---
+
+- name: (sys) install python3 on hosts
+  hosts: all
+  tasks:
+    - name: python3-minimal for ansible
+      shell: "test -e /usr/bin/python3 || (apt update -y && apt install python3-minimal --no-install-recommends)"
+      changed_when: false
