@@ -145,6 +145,8 @@
       command: "./configure {{ nginx_openssl_module }} --with-ld-opt=-lrt {{ nginx_cache_conf_dir }} --user={{ nginx_user }} --group={{ nginx_user }} --prefix={{ nginx_conf_dir }} --error-log-path={{ nginx_var_log_dir }}/nginx-error.log --http-log-path={{ nginx_var_log_dir }}/nginx-access.log --sbin-path=/usr/sbin/nginx --conf-path={{ nginx_conf_dir }}/nginx.conf {{ nginx_misc_modules }} {{ nginx_headers_more_module }} {{ nginx_brotli_module }} {{ nginx_naxsi_module }}"
 
     - name: (build) make nginx sources great again
+      args:
+        chdir: "/usr/src/{{ nginx_version }}/{{ nginx_version }}"
       shell: "make && make install"
 
     - name: (build) Adding some Naxsi core rules from sources
