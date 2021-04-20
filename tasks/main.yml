@@ -128,8 +128,8 @@
         mode: "0755"
 
     - name: (build) download latest nginx module headers_more
-      unarchive:
-        src: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
+      get_url:
+        url: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
         dest: "/usr/src/headers-more-nginx-module-0.33"
 
     - name: (build) configure nginx sources
