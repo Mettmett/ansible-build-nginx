@@ -1,8 +1,5 @@
 ---
 
 - name: Converge
-  hosts: all
-  tasks:
-    - name: (ansible) apply role on test env
-      include_role:
-        name: build-nginx
+  import_playbook: ../../tasks/main.yml
+    
