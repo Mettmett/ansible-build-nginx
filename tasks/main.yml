@@ -153,6 +153,7 @@
       copy:
         src: "/usr/src/naxsi/naxsi_config/naxsi_core.rules"
         dest: "/etc/nginx/naxsi_core.rules"
+        remote_src: true
         owner: "root"
         group: "root"
         mode: u+rw,g-wx,o-wx
