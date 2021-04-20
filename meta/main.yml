@@ -12,7 +12,9 @@ galaxy_info:
   platforms:
     - name: Debian
       versions:
-        - 9
         - 10
+    - name: Ubuntu
+      versions:
+        - 20.04
 
   dependencies: []
