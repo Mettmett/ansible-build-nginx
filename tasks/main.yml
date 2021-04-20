@@ -14,7 +14,7 @@
     nginx_openssl_module: "--with-openssl=/usr/src/openssl --with-openssl-opt=enable-tls1_3"
     nginx_brotli_module: "--add-module=/usr/src/ngx_brotli"
     nginx_naxsi_module: "--add-module=/usr/src/naxsi/naxsi_src"
-    nginx_headers_more_module: "--add-module=/usr/src/headers-more-nginx-module-0.33"
+    nginx_headers_more_module: "--add-module=/usr/src/headers-more-nginx-module-0.33/headers-more-nginx-module-0.33"
     openssl_version: "OpenSSL_1_1_1-stable"
 
   tasks:
@@ -121,16 +121,23 @@
         version: "master"
         # git submodule update --init
 
+    - name: (build) download latest nginx module headers_more
+      get_url:
+        url: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
+        dest: "/usr/src/headers-more-nginx-module-0.33.tar.gz"
+
     - name: (build) create the folder for nginx headers more module
       file:
         path: "/usr/src/headers-more-nginx-module-0.33"
         state: directory
         mode: "0755"
 
-    - name: (build) download latest nginx module headers_more
-      get_url:
-        url: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
+    - name: (build) unpack nginx module headers_more
+      unarchive:
+        copy: false
         dest: "/usr/src/headers-more-nginx-module-0.33"
+        src: "/usr/src/headers-more-nginx-module-0.33.tar.gz"
+      register: nginx_module_headers_unpack
 
     - name: (build) configure nginx sources
       args:
