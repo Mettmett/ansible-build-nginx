@@ -1,20 +1,9 @@
 ---
-# roles/nginx/build.yml
+# tasks/main.yml
 
 - name: Compile NGINX from sources
-  vars:
-    nginx_version: "nginx-1.19.10"
-    nginx_user: "www-data"
-    nginx_conf_dir: "/etc/nginx"
-    nginx_var_log_dir: "/var/log/nginx"
-    nginx_cache_conf_dir: "--http-client-body-temp-path=/usr/local/etc/nginx/body --http-fastcgi-temp-path=/usr/local/etc/nginx/fastcgi --http-proxy-temp-path=/usr/local/etc/nginx/proxy --http-scgi-temp-path=/usr/local/etc/nginx/scgi --http-uwsgi-temp-path=/usr/local/etc/nginx/uwsgi"
-    nginx_misc_modules: "--with-pcre-jit --with-http_v2_module --with-debug --with-http_stub_status_module --with-http_realip_module --with-http_addition_module --with-http_dav_module --with-http_gzip_static_module --with-http_sub_module --with-http_xslt_module --with-file-aio --with-threads --with-http_ssl_module --with-http_geoip_module"
-    nginx_openssl_module: "--with-openssl=/usr/src/openssl --with-openssl-opt=enable-tls1_3"
-    nginx_brotli_module: "--add-module=../ngx_brotli"
-    nginx_naxsi_module: "--add-module=../naxsi/naxsi_src"
-    nginx_headers_more_module: "--add-module=../headers-more-nginx-module-0.33"
-    openssl_version: "OpenSSL_1_1_1-stable"
-
+  hosts: all
+  become: true
   tasks:
     - name: (sys) update host apt cache
       apt:
@@ -24,25 +13,27 @@
     - name: (sys) install sys tools
       apt:
         name: "{{ item }}"
-      with_items:
+        state: present
+        install_recommends: false
+      loop:
         - tar
         - unzip
         - curl
         - git
         - rsync
-      state: present
-      install_recommends: false
 
     - name: (sys) install build tools
       apt:
         name: build-essential
-      state: present
-      install_recommends: false
+        state: present
+        install_recommends: false
 
     - name: (sys) install needed libs
       apt:
         name: "{{ item }}"
-      with_items:
+        state: present
+        install_recommends: false
+      loop:
         - libgeoip-dev
         - libxslt1-dev
         - libpcre3
@@ -50,15 +41,15 @@
         - zlib1g-dev
         - libbz2-dev
         - libssl-dev
-      state: present
-      install_recommends: false
 
     - name: (build) cleaning old sources
+      args:
+        warn: false
       shell: |
         rm -fr /usr/src/nginx*
         rm -fr /usr/src/openssl*
         rm -fr /usr/src/ngx_brotli
-        rm -fr /usr/src/naxsi
+        rm -fr /usr/src/naxsi  
 
     - name: (build) download nginx sources
       get_url:
@@ -190,4 +181,6 @@
         dameon_reload: true
 
     - name: (sys) cleaning sources
+      args:
+        warn: false
       shell: "rm /usr/src/*.tar.gz"
