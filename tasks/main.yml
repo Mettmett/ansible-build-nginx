@@ -60,9 +60,10 @@
         warn: false
       shell: |
         rm -fr /usr/src/nginx*
-        rm -fr /usr/src/openssl*
+        rm -fr /usr/src/openssl
         rm -fr /usr/src/ngx_brotli
-        rm -fr /usr/src/naxsi  
+        rm -fr /usr/src/naxsi
+        rm -fr /usr/src/headers-more-nginx-module-0.33
 
     - name: (build) download nginx sources
       get_url:
