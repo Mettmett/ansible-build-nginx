@@ -12,9 +12,9 @@
     nginx_cache_conf_dir: "--http-client-body-temp-path=/usr/local/etc/nginx/body --http-fastcgi-temp-path=/usr/local/etc/nginx/fastcgi --http-proxy-temp-path=/usr/local/etc/nginx/proxy --http-scgi-temp-path=/usr/local/etc/nginx/scgi --http-uwsgi-temp-path=/usr/local/etc/nginx/uwsgi"
     nginx_misc_modules: "--with-pcre-jit --with-http_v2_module --with-debug --with-http_stub_status_module --with-http_realip_module --with-http_addition_module --with-http_dav_module --with-http_gzip_static_module --with-http_sub_module --with-http_xslt_module --with-file-aio --with-threads --with-http_ssl_module --with-http_geoip_module"
     nginx_openssl_module: "--with-openssl=/usr/src/openssl --with-openssl-opt=enable-tls1_3"
-    nginx_brotli_module: "--add-module=../ngx_brotli"
-    nginx_naxsi_module: "--add-module=../naxsi/naxsi_src"
-    nginx_headers_more_module: "--add-module=../headers-more-nginx-module-0.33"
+    nginx_brotli_module: "--add-module=/usr/src/ngx_brotli"
+    nginx_naxsi_module: "--add-module=/usr/src/naxsi/naxsi_src"
+    nginx_headers_more_module: "--add-module=/usr/src/headers-more-nginx-module-0.33"
     openssl_version: "OpenSSL_1_1_1-stable"
 
   tasks:
@@ -82,7 +82,6 @@
         copy: false
         dest: "/usr/src/{{ nginx_version }}"
         src: "{{ nginx_source.dest }}"
-      when: nginx_source.changed
       register: nginx_source_unpack
 
     - name: (build) create the folder for openssl sources
@@ -134,17 +133,12 @@
         dest: "/usr/src/headers-more-nginx-module-0.33"
 
     - name: (build) configure nginx sources
-      command: "./configure {{ nginx_openssl_module }} --with-ld-opt=-lrt {{ nginx_cache_conf_dir }} --user={{ nginx_user }} --group={{ nginx_user }} --prefix={{ nginx_conf_dir }} --error-log-path={{ nginx_var_log_dir }}/nginx-error.log --http-log-path={{ nginx_var_log_dir }}/nginx-access.log --sbin-path=/usr/sbin/nginx --conf-path={{ nginx_conf_dir }}/nginx.conf {{ nginx_misc_modules }} {{ nginx_headers_more_module }} {{ nginx_brotli_module }} {{ nginx_naxsi_module }}"
       args:
-        chdir: "{{ nginx_source.dest }}"
-      when: nginx_source_unpack|changed
-      register: nginx_configure
+        chdir: "/usr/src/{{ nginx_version }}/{{ nginx_version }}"
+      command: "./configure {{ nginx_openssl_module }} --with-ld-opt=-lrt {{ nginx_cache_conf_dir }} --user={{ nginx_user }} --group={{ nginx_user }} --prefix={{ nginx_conf_dir }} --error-log-path={{ nginx_var_log_dir }}/nginx-error.log --http-log-path={{ nginx_var_log_dir }}/nginx-access.log --sbin-path=/usr/sbin/nginx --conf-path={{ nginx_conf_dir }}/nginx.conf {{ nginx_misc_modules }} {{ nginx_headers_more_module }} {{ nginx_brotli_module }} {{ nginx_naxsi_module }}"
 
     - name: (build) make nginx sources great again
       shell: "make && make install"
-      args:
-        chdir: "{{ nginx_source.dest }}"
-      when: nginx_configure|changed
 
     - name: (build) Adding some Naxsi core rules from sources
       copy:
