@@ -1,4 +1,4 @@
 #!/bin/bash
 
-tox --recreate
+tox
 source .tox/py3-ansible/bin/activate
