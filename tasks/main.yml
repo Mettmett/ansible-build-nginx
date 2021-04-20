@@ -70,6 +70,12 @@
         dest: "/usr/src/{{ nginx_version }}.tar.gz"
       register: nginx_source
 
+    - name: (build) create the folder for nginx sources
+      file:
+        path: "/usr/src/{{ nginx_version }}"
+        state: directory
+        mode: "0755"
+
     - name: (build) unpack nginx sources
       unarchive:
         copy: false
@@ -78,11 +84,23 @@
       when: nginx_source.changed
       register: nginx_source_unpack
 
+    - name: (build) create the folder for openssl sources
+      file:
+        path: "/usr/src/openssl"
+        state: directory
+        mode: "0755"
+
     - name: (build) download latest OpenSSL
       git:
         repo: "https://github.com/openssl/openssl.git"
         dest: "/usr/src/openssl"
         version: "{{ openssl_version }}"
+
+    - name: (build) create the folder for naxsi sources
+      file:
+        path: "/usr/src/naxsi"
+        state: directory
+        mode: "0755"
 
     - name: (build) download latest naxsi
       git:
@@ -90,12 +108,24 @@
         dest: "/usr/src/naxsi"
         version: "master"
 
+    - name: (build) create the folder for brotli sources
+      file:
+        path: "/usr/src/ngx_brotli"
+        state: directory
+        mode: "0755"
+
     - name: (build) download latest Brotli
       git:
         repo: "https://github.com/google/ngx_brotli.git"
         dest: "/usr/src/ngx_brotli"
         version: "master"
         # git submodule update --init
+
+    - name: (build) create the folder for nginx headers more module
+      file:
+        path: "/usr/src/headers-more-nginx-module-0.33"
+        state: directory
+        mode: "0755"
 
     - name: (build) download latest nginx module headers_more
       unarchive:
