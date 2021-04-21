@@ -163,9 +163,14 @@
         path: "/lib/systemd/system/nginx.service"
         state: absent
 
+    - name: (sys) create an empty systemd unit file
+      file:
+        path: "/lib/systemd/system/nginx.service"
+        state: touch
+
     - name: (sys) installing systemd unit
       template:
-        src: "{{ lookup('file', {{ playbook_dir }}/templates/nginx.service.j2') }}"
+        src: "{{ lookup('file', '{{ playbook_dir }}/templates/nginx.services.j2') }}"
         dest: "/lib/systemd/system/nginx.service"
         owner: "root"
         group: "root"
@@ -188,9 +193,14 @@
         path: "/etc/logrotate/nginx"
         state: absent
 
+    - name: (sys) create empty nginx logrotate configuration file
+      file:
+        path: "/etc/logrotate/nginx"
+        state: touch
+
     - name: (sys) installing our nginx logrotate configuration
       template:
-        src: "{{ lookup('file', {{ playbook_dir }}/templates/logrotate.nginx.j2') }}"
+        src: "{{ lookup('file', '{{ playbook_dir }}/templates/logrotate.nginx.j2') }}"
         dest: "/etc/logrotate/nginx"
         owner: "root"
         group: "root"
@@ -198,7 +208,7 @@
 
     - name: (sys) installing our nginx configuration
       template:
-        src: "{{ lookup('file', {{ playbook_dir }}/templates/nginx.conf.j2') }}"
+        src: "{{ lookup('file', '{{ playbook_dir }}/templates/nginx.conf.j2') }}"
         dest: "/etc/nginx/nginx.conf"
         owner: "root"
         group: "root"
