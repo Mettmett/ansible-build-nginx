@@ -163,14 +163,9 @@
         path: "/lib/systemd/system/nginx.service"
         state: absent
 
-    - name: (sys) create an empty systemd unit file
-      file:
-        path: "/lib/systemd/system/nginx.service"
-        state: touch
-
     - name: (sys) installing systemd unit
       template:
-        src: "{{ lookup('file', '{{ playbook_dir }}/templates/nginx.services.j2') }}"
+        src: "templates/nginx.services.j2"
         dest: "/lib/systemd/system/nginx.service"
         owner: "root"
         group: "root"
@@ -190,25 +185,20 @@
 
     - name: (sys) remove previous nginx logrotate configuration file if exists
       file:
-        path: "/etc/logrotate/nginx"
+        path: "/etc/logrotate.d/nginx"
         state: absent
-
-    - name: (sys) create empty nginx logrotate configuration file
-      file:
-        path: "/etc/logrotate/nginx"
-        state: touch
 
     - name: (sys) installing our nginx logrotate configuration
       template:
-        src: "{{ lookup('file', '{{ playbook_dir }}/templates/logrotate.nginx.j2') }}"
-        dest: "/etc/logrotate/nginx"
+        src: "templates/logrotate.nginx.j2"
+        dest: "/etc/logrotate.d/nginx"
         owner: "root"
         group: "root"
         mode: u+rw,g-wx,o-wx
 
     - name: (sys) installing our nginx configuration
       template:
-        src: "{{ lookup('file', '{{ playbook_dir }}/templates/nginx.conf.j2') }}"
+        src: "templates/nginx.conf.j2"
         dest: "/etc/nginx/nginx.conf"
         owner: "root"
         group: "root"
@@ -216,13 +206,21 @@
 
     - name: (sys) create needed folders for nginx configuration
       file:
-        path: "/etc/nginx/{{ items }}"
+        path: "/etc/nginx/conf.d"
         state: directory
         mode: "0755"
-      with_items:
-        - conf.d
-        - sites-available
-        - sites-enabled
+
+    - name: (sys) create needed folders for nginx configuration
+      file:
+        path: "/etc/nginx/sites-available"
+        state: directory
+        mode: "0755"
+
+    - name: (sys) create needed folders for nginx configuration
+      file:
+        path: "/etc/nginx/sites-enabled"
+        state: directory
+        mode: "0755"
 
     - name: (sys) create cache folder for nginx
       file:
@@ -234,7 +232,7 @@
       systemd:
         name: "nginx"
         state: restarted
-        dameon_reload: true
+        daemon_reload: true
 
     - name: (sys) cleaning sources
       args:
