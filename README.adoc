@@ -1,0 +1,38 @@
+= README
+
+== Goals
+
+Little Ansible role to build Nginx from sources, with few modules to enforce its strengh.
+
+== Vars
+
+Some variables are used.
+
+== How to use it ?
+
+=== Test it with molecule
+
+Simple ! Use the venv.sh script and enter in the matrix (c).
+
+```bash
+source venv.sh
+```
+
+This virtualenv will bring you needed tools. You will in the virtualenv automatically. You are now ready to create virtual machines.
+
+```bash
+molecule create
+```
+
+And then use the playbook
+
+```bash
+molecule converge
+```
+
+=== Launch it 
+
+
+
+=== Use this role in another ansible playbook
+

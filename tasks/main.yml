@@ -55,16 +55,6 @@
         - libbz2-dev
         - libssl-dev
 
-    - name: (build) cleaning old sources
-      args:
-        warn: false
-      shell: |
-        rm -fr /usr/src/nginx*
-        rm -fr /usr/src/openssl
-        rm -fr /usr/src/ngx_brotli
-        rm -fr /usr/src/naxsi
-        rm -fr /usr/src/headers-more-nginx-module-0.33
-
     - name: (build) download nginx sources
       get_url:
         url: "https://nginx.org/download/{{ nginx_version }}.tar.gz"
@@ -119,7 +109,6 @@
         repo: "https://github.com/google/ngx_brotli.git"
         dest: "/usr/src/ngx_brotli"
         version: "master"
-        # git submodule update --init
 
     - name: (build) download latest nginx module headers_more
       get_url:
@@ -158,11 +147,6 @@
         group: "root"
         mode: u+rw,g-wx,o-wx
 
-    - name: (sys) remove previous systemd unit file if exists
-      file:
-        path: "/lib/systemd/system/nginx.service"
-        state: absent
-
     - name: (sys) installing systemd unit
       template:
         src: "templates/nginx.services.j2"
@@ -182,11 +166,6 @@
         name: "logrotate"
         state: present
         install_recommends: false
-
-    - name: (sys) remove previous nginx logrotate configuration file if exists
-      file:
-        path: "/etc/logrotate.d/nginx"
-        state: absent
 
     - name: (sys) installing our nginx logrotate configuration
       template:
@@ -234,7 +213,29 @@
         state: restarted
         daemon_reload: true
 
-    - name: (sys) cleaning sources
+    - name: (build) cleaning sources
       args:
         warn: false
-      shell: "rm /usr/src/*.tar.gz"
+      shell: |
+        rm -fr /usr/src/nginx*
+        rm -fr /usr/src/openssl*
+        rm -fr /usr/src/ngx_brotli*
+        rm -fr /usr/src/naxsi*
+        rm -fr /usr/src/headers-more-nginx*
+
+    - name: (sys) uninstall build tools
+      apt:
+        name: build-essential
+        state: absent
+
+    - name: (sys) uninstall dev libs
+      apt:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - libgeoip-dev
+        - libxslt1-dev
+        - libpcre3-dev
+        - zlib1g-dev
+        - libbz2-dev
+        - libssl-dev
