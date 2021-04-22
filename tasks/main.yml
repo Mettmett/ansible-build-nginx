@@ -201,11 +201,43 @@
         state: directory
         mode: "0755"
 
+    - name: (sys) creating a default root folder for web apps
+      file:
+        path: "/var/www/htdocs"
+        state: directory
+        mode: "0755"
+        owner: "www-data"
+        group: "www-data"
+
     - name: (sys) create cache folder for nginx
       file:
         path: "/usr/local/etc/nginx"
         state: directory
         mode: "0755"
+
+    - name: (sys) installing a basic nginx vhost
+      template:
+        src: "templates/default.conf.j2"
+        dest: "/etc/nginx/sites-available/default.conf"
+        owner: "root"
+        group: "root"
+        mode: u+rw,g-wx,o-wx
+
+    - name: Create a symbolic link
+      file:
+        src: "/etc/nginx/sites-available/default.conf"
+        dest: "/etc/nginx/sites-enabled/default.conf"
+        owner: "root"
+        group: "root"
+        state: link
+
+    - name: (sys) installing a basic html file
+      template:
+        src: "templates/index.html.j2"
+        dest: "/var/www/htdocs/index.html"
+        owner: "www-data"
+        group: "www-data"
+        mode: u+rw,g-wx,o-wx
 
     - name: (sys) start nginx to the moon
       systemd:

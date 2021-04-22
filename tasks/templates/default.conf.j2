@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+server {
+  listen 80 default_server;
+  server_name _;
+  
+  root /var/www/htdocs;
+  access_log default.access.log;
+
+  server_name_in_redirect off;
+}
