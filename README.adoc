@@ -4,15 +4,36 @@
 
 Little Ansible role to build Nginx from sources, with few modules to enforce its strengh.
 
+== What remains to be done ?
+
+- use handlers
+- create ansible tags
+- use a mechanism to build in a container/fakeroot, not in the env prod
+- add a vhost example
+- create a verify test/molecule
+- add your value!
+
 == Vars
 
-Some variables are used.
+Some variables are used in the file `main.yml`.
+
+- nginx_version: version to download at nginx.org/en/download.html. Default used : mainline version
+- nginx_user: can be changed by whatever you want
+- nginx_conf_dir: where all nginx conf files are placed
+- nginx_var_log_dir: used to put nginx and vhost log files
+- nginx_cache_conf_dir: specific options for nginx about temp files
+- nginx_misc_modules: default modules in nginx, no 3rd parts
+- openssl_version: use the branch name of the GitHub OpenSSL repository
+- nginx_openssl_module: 3rd module, builded from sources
+- nginx_brotli_module: 3rd module, builded from sources
+- nginx_naxsi_module: 3rd module, builded from sources
+
 
 == How to use it ?
 
 === Test it with molecule
 
-Simple ! Use the venv.sh script and enter in the matrix (c).
+Simple ! Use the venv.sh script to enter to the matrix (c).
 
 ```bash
 source venv.sh
@@ -30,9 +51,18 @@ And then use the playbook
 molecule converge
 ```
 
-=== Launch it 
+When you're all set, destroy it.
 
-
+```bash
+molecule destroy
+```
 
 === Use this role in another ansible playbook
 
+*NEED FIX*
+
+Incorpore this role on your playbook and go !
+
+```bash
+
+```
