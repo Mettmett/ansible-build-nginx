@@ -18,18 +18,16 @@ platforms:
     box: ubuntu/focal64
     interfaces:
       - auto_config: true
-        ip: 192.168.100.5
-        netmask: 29
+        ip: 192.168.56.5
+        netmask: 24
         network_name: private_network
-        virtualbox__intnet: true
   - name: nginx-debian
     box: debian/buster64
     interfaces:
       - auto_config: true
-        ip: 192.168.100.6
-        netmask: 29
+        ip: 192.168.56.6
+        netmask: 24
         network_name: private_network
-        virtualbox__intnet: true
 
 provisioner:
   name: ansible
