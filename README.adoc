@@ -27,7 +27,6 @@ Some variables are used in the file `main.yml`.
 - nginx_brotli_module: 3rd module, builded from sources
 - nginx_naxsi_module: 3rd module, builded from sources
 
-
 == How to use it ?
 
 === Test it with molecule
@@ -58,10 +57,11 @@ molecule destroy
 
 === Use this role in another ansible playbook
 
-*NEED FIX*
-
-Incorpore this role on your playbook and go !
+Incorpore this role on your playbook and go ! Add this block on your `requirements.yml`
 
 ```bash
-
+---
+roles:
+  - src: git@github.com:Mettmett/ansible-build-nginx.git
+    scm: git
 ```
