@@ -17,17 +17,19 @@ platforms:
   - name: nginx-ubuntu
     box: ubuntu/focal64
     interfaces:
-      - auto_config: true
+      - network_name: private_network
+        type: static
         ip: 192.168.56.5
         netmask: 24
-        network_name: private_network
+        auto_config: true
   - name: nginx-debian
     box: debian/buster64
     interfaces:
-      - auto_config: true
+      - network_name: private_network
+        type: static
         ip: 192.168.56.6
         netmask: 24
-        network_name: private_network
+        auto_config: true        
 
 provisioner:
   name: ansible
