@@ -1,6 +1,6 @@
 ---
 
-nginx_version: "nginx-1.19.10"
+nginx_version: "nginx-1.20.1"
 nginx_user: "www-data"
 nginx_conf_dir: "/etc/nginx"
 nginx_var_log_dir: "/var/log/nginx"
