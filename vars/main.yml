@@ -24,6 +24,7 @@ nginx_misc_modules: "--with-pcre-jit \
   --with-file-aio \
   --with-threads \
   --with-http_ssl_module \
+  --with-http_stub_status_module \
   --with-http_geoip_module"
 
 nginx_openssl_module: "--with-openssl=/usr/src/openssl --with-openssl-opt=enable-tls1_3"

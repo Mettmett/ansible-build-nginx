@@ -213,10 +213,26 @@
     group: "root"
     mode: u+rw,g-wx,o-wx
 
+- name: (sys) installing nginx status page vhost
+  template:
+    src: "templates/status.conf.j2"
+    dest: "/etc/nginx/sites-available/status.conf"
+    owner: "root"
+    group: "root"
+    mode: u+rw,g-wx,o-wx
+
 - name: Create a symbolic link
   file:
     src: "/etc/nginx/sites-available/default.conf"
     dest: "/etc/nginx/sites-enabled/default.conf"
+    owner: "root"
+    group: "root"
+    state: link
+
+- name: Create a symbolic link for status page
+  file:
+    src: "/etc/nginx/sites-available/status.conf"
+    dest: "/etc/nginx/sites-enabled/status.conf"
     owner: "root"
     group: "root"
     state: link

@@ -16,10 +16,16 @@
     shell: "ss -ntlp | grep {{ item }}"
     loop:
       - 80
+      - 81
       - nginx
     changed_when: false
 
   - name: (check) Test if web interface is OK
     uri:
       url: "http://localhost"
+      status_code: 200
+
+  - name: (check) Test if status page is OK
+    uri:
+      url: "http://localhost:81/nginx_status"
       status_code: 200
