@@ -20,6 +20,10 @@
       - nginx
     changed_when: false
 
+  - name: (check) Test nginx configuration
+    shell: "nginx -t"
+    changed_when: false
+
   - name: (check) Test if web interface is OK
     uri:
       url: "http://localhost"
