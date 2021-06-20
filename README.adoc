@@ -9,7 +9,6 @@ Little Ansible role to build Nginx from sources, with few modules to enforce its
 - use handlers
 - create ansible tags
 - use a mechanism to build in a container/fakeroot, not in the env prod
-- create a verify test/molecule
 - add your value!
 
 == Vars
