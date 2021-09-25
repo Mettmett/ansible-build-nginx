@@ -3,9 +3,9 @@
 server {
   listen 80 default_server;
   server_name _;
-  
-  root /var/www/htdocs;
-  access_log default.access.log;
 
-  server_name_in_redirect off;
+  access_log /var/log/nginx/access.default.log combined buffer=256k flush=30s;
+  error_log /var/log/nginx/error.default.log;
+
+  root /var/www/htdocs;
 }
