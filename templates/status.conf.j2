@@ -3,10 +3,8 @@
 server {
   listen 81;
   server_name _;
-  
-  access_log default.access.log;
 
-  server_name_in_redirect off;
+  error_log /var/log/nginx/error.status.log;
 
   location /nginx_status {
     stub_status;
