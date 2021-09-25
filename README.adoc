@@ -6,7 +6,6 @@ Little Ansible role to build Nginx from sources, with few modules to enforce its
 
 == What remains to be done ?
 
-- use handlers
 - create ansible tags
 - use a mechanism to build in a container/fakeroot, not in the env prod
 - add your value!

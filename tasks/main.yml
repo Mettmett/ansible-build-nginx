@@ -261,10 +261,14 @@
     rm -fr /usr/src/naxsi*
     rm -fr /usr/src/headers-more-nginx*
 
-- name: (sys) uninstall build tools
-  apt:
-    name: build-essential
-    state: absent
+- name: (sys) installing systemd unit
+  template:
+    src: "templates/nginx.services.j2"
+    dest: "/lib/systemd/system/nginx.service"
+    owner: "root"
+    group: "root"
+    mode: a+x
+  notify: start nginx
 
 - name: (sys) uninstall dev libs
   apt:
