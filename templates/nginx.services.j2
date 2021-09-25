@@ -1,18 +1,32 @@
 # {{ ansible_managed }}
 [Unit]
-Description=The NGINX HTTP and reverse proxy server
 After=syslog.target network-online.target remote-fs.target nss-lookup.target
+AssertPathExists=/etc/nginx/nginx.conf
+Description=The NGINX HTTP and reverse proxy server
+Documentation=https://www.nginx.com/resources/wiki/
 
 [Service]
-Type=forking
-PIDFile=/run/nginx.pid
-ExecStartPre=/usr/sbin/nginx -t
-ExecStart=/usr/sbin/nginx
-Restart=always
-RestartSec=5s
 ExecReload=/bin/kill -s HUP $MAINPID
+ExecStart=/usr/sbin/nginx
+ExecStartPre=/usr/sbin/nginx -t
 ExecStop=/bin/kill -s QUIT $MAINPID
+PIDFile=/run/nginx.pid
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=300
+Type=forking
+
+# Hardening
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
 PrivateTmp=true
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictNamespaces=true
+RestrictSUIDSGID=true
 
 [Install]
 WantedBy=multi-user.target
