@@ -6,49 +6,43 @@
     update_cache: true
     cache_valid_time: 3600
 
-- name: (sys) install sys tools
+- name: (sys) install sys tools and needed libs
   apt:
     name: "{{ item }}"
     state: present
     install_recommends: false
   loop:
-    - tar
-    - unzip
+    - build-essential
     - curl
     - git
-    - rsync
-
-- name: (sys) install build tools
-  apt:
-    name: build-essential
-    state: present
-    install_recommends: false
-
-- name: (sys) install needed libs
-  apt:
-    name: "{{ item }}"
-    state: present
-    install_recommends: false
-  loop:
+    - libbz2-dev
     - libgeoip-dev
-    - libxslt1-dev
     - libpcre3
     - libpcre3-dev
-    - zlib1g-dev
-    - libbz2-dev
     - libssl-dev
+    - libxslt1-dev
+    - rsync
+    - tar
+    - unzip
+    - zlib1g-dev
+
+- name: (build) create folders for sources builds
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "/usr/src/{{ nginx_version }}"
+    - "/usr/src/headers-more-nginx-module-0.33"
+    - "/usr/src/naxsi"
+    - "/usr/src/ngx_brotli"
+    - "/usr/src/openssl"
 
 - name: (build) download nginx sources
   get_url:
     url: "https://nginx.org/download/{{ nginx_version }}.tar.gz"
     dest: "/usr/src/{{ nginx_version }}.tar.gz"
   register: nginx_source
-
-- name: (build) create the folder for nginx sources
-  file:
-    path: "/usr/src/{{ nginx_version }}"
-    state: directory
-    mode: "0755"
 
 - name: (build) unpack nginx sources
   unarchive:
@@ -57,35 +51,17 @@
     src: "{{ nginx_source.dest }}"
   register: nginx_source_unpack
 
-- name: (build) create the folder for openssl sources
-  file:
-    path: "/usr/src/openssl"
-    state: directory
-    mode: "0755"
-
 - name: (build) download latest OpenSSL
   git:
     repo: "https://github.com/openssl/openssl.git"
     dest: "/usr/src/openssl"
     version: "{{ openssl_version }}"
 
-- name: (build) create the folder for naxsi sources
-  file:
-    path: "/usr/src/naxsi"
-    state: directory
-    mode: "0755"
-
 - name: (build) download latest naxsi
   git:
     repo: "https://github.com/nbs-system/naxsi.git"
     dest: "/usr/src/naxsi"
     version: "master"
-
-- name: (build) create the folder for brotli sources
-  file:
-    path: "/usr/src/ngx_brotli"
-    state: directory
-    mode: "0755"
 
 - name: (build) download latest Brotli
   git:
@@ -97,12 +73,6 @@
   get_url:
     url: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
     dest: "/usr/src/headers-more-nginx-module-0.33.tar.gz"
-
-- name: (build) create the folder for nginx headers more module
-  file:
-    path: "/usr/src/headers-more-nginx-module-0.33"
-    state: directory
-    mode: "0755"
 
 - name: (build) unpack nginx module headers_more
   unarchive:
@@ -137,20 +107,6 @@
     group: "root"
     mode: u+rw,g-wx,o-wx
 
-- name: (sys) installing systemd unit
-  template:
-    src: "templates/nginx.services.j2"
-    dest: "/lib/systemd/system/nginx.service"
-    owner: "root"
-    group: "root"
-    mode: a+x
-
-- name: (sys) enabling nginx systemd unit file
-  systemd:
-    name: "nginx"
-    enabled: true
-    masked: false
-
 - name: (sys) install logrotate
   apt:
     name: "logrotate"
@@ -175,21 +131,14 @@
 
 - name: (sys) create needed folders for nginx configuration
   file:
-    path: "/etc/nginx/conf.d"
+    path: "{{ item }}"
     state: directory
     mode: "0755"
-
-- name: (sys) create needed folders for nginx configuration
-  file:
-    path: "/etc/nginx/sites-available"
-    state: directory
-    mode: "0755"
-
-- name: (sys) create needed folders for nginx configuration
-  file:
-    path: "/etc/nginx/sites-enabled"
-    state: directory
-    mode: "0755"
+  loop:
+    - "/etc/nginx/sites-available"
+    - "/etc/nginx/sites-enabled"
+    - "/usr/local/etc/nginx"
+    - "var/log/nginx/"
 
 - name: (sys) creating a default root folder for web apps
   file:
@@ -198,12 +147,6 @@
     mode: "0755"
     owner: "www-data"
     group: "www-data"
-
-- name: (sys) create cache folder for nginx
-  file:
-    path: "/usr/local/etc/nginx"
-    state: directory
-    mode: "0755"
 
 - name: (sys) installing a basic nginx vhost
   template:
@@ -245,12 +188,6 @@
     group: "www-data"
     mode: u+rw,g-wx,o-wx
 
-- name: (sys) start nginx to the moon
-  systemd:
-    name: "nginx"
-    state: restarted
-    daemon_reload: true
-
 - name: (build) cleaning sources
   args:
     warn: false
@@ -270,11 +207,12 @@
     mode: a+x
   notify: start nginx
 
-- name: (sys) uninstall dev libs
+- name: (sys) uninstall dev tools and libs
   apt:
     name: "{{ item }}"
     state: absent
   loop:
+    - build-essential
     - libgeoip-dev
     - libxslt1-dev
     - libpcre3-dev
