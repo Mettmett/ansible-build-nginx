@@ -30,6 +30,14 @@ platforms:
         ip: 192.168.56.6
         netmask: 24
         auto_config: true
+  - name: nginx-debian11
+    box: debian/bullseye64
+    interfaces:
+      - network_name: private_network
+        type: static
+        ip: 192.168.56.7
+        netmask: 24
+        auto_config: true
 
 provisioner:
   name: ansible
