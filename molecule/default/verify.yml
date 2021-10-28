@@ -6,22 +6,19 @@
   tasks:
   - name: (check) Test if services are started and enabled
     systemd:
-      name: "{{ item }}"
-      state: started
       enabled: true
-    loop:
-      - nginx.service
+      name: "nginx.service"
+      state: started
 
   - name: (check) Test if services ports are open and reachable
-    shell: "ss -ntlp | grep {{ item }}"
+    wait_for:
+      port: "{{ item }}"
     loop:
       - 80
       - 81
-      - nginx
-    changed_when: false
 
   - name: (check) Test nginx configuration
-    shell: "nginx -t"
+    command: "nginx -t"
     changed_when: false
 
   - name: (check) Test if web interface is OK
