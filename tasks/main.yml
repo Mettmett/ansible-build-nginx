@@ -30,7 +30,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    mode: "0755"
+    mode: 0755
   loop:
     - "/usr/src/{{ nginx_version }}"
     - "/usr/src/headers-more-nginx-module-0.33"
@@ -133,7 +133,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    mode: "0755"
+    mode: 0755
   loop:
     - "/etc/nginx/sites-available"
     - "/etc/nginx/sites-enabled"
@@ -144,7 +144,7 @@
   file:
     path: "/var/www/htdocs"
     state: directory
-    mode: "0755"
+    mode: 0755
     owner: "www-data"
     group: "www-data"
 
