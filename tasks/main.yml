@@ -96,7 +96,7 @@
 - name: (build) make nginx sources great again
   args:
     chdir: "/usr/src/{{ nginx_version }}/{{ nginx_version }}"
-  command: "make && make install"
+  shell: "make && make install"
 
 - name: (build) Adding some Naxsi core rules from sources
   copy:
@@ -189,14 +189,13 @@
     src: "templates/index.html.j2"
 
 - name: (build) cleaning sources
-  args:
-    warn: false
-  shell: |
-    rm -fr /usr/src/headers-more-nginx*
-    rm -fr /usr/src/naxsi*
-    rm -fr /usr/src/nginx*
-    rm -fr /usr/src/ngx_brotli*
-    rm -fr /usr/src/openssl*
+  command: rm -fr {{ item }}
+  loop:
+    - "/usr/src/headers-more-nginx*"
+    - "/usr/src/naxsi*"
+    - "/usr/src/nginx*"
+    - "/usr/src/ngx_brotli*"
+    - "/usr/src/openssl*"
 
 - name: (sys) installing systemd unit
   template:
