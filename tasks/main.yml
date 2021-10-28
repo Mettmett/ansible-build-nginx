@@ -3,14 +3,14 @@
 
 - name: (sys) update host apt cache
   apt:
-    update_cache: true
     cache_valid_time: 3600
+    update_cache: true
 
 - name: (sys) install sys tools and needed libs
   apt:
+    install_recommends: false
     name: "{{ item }}"
     state: present
-    install_recommends: false
   loop:
     - build-essential
     - curl
@@ -28,9 +28,9 @@
 
 - name: (build) create folders for sources builds
   file:
+    mode: 0755
     path: "{{ item }}"
     state: directory
-    mode: 0755
   loop:
     - "/usr/src/{{ nginx_version }}"
     - "/usr/src/headers-more-nginx-module-0.33"
@@ -40,8 +40,8 @@
 
 - name: (build) download nginx sources
   get_url:
-    url: "https://nginx.org/download/{{ nginx_version }}.tar.gz"
     dest: "/usr/src/{{ nginx_version }}.tar.gz"
+    url: "https://nginx.org/download/{{ nginx_version }}.tar.gz"
   register: nginx_source
 
 - name: (build) unpack nginx sources
@@ -53,26 +53,26 @@
 
 - name: (build) download latest OpenSSL
   git:
-    repo: "https://github.com/openssl/openssl.git"
     dest: "/usr/src/openssl"
+    repo: "https://github.com/openssl/openssl.git"
     version: "{{ openssl_version }}"
 
 - name: (build) download latest naxsi
   git:
-    repo: "https://github.com/nbs-system/naxsi.git"
     dest: "/usr/src/naxsi"
+    repo: "https://github.com/nbs-system/naxsi.git"
     version: "master"
 
 - name: (build) download latest Brotli
   git:
-    repo: "https://github.com/google/ngx_brotli.git"
     dest: "/usr/src/ngx_brotli"
+    repo: "https://github.com/google/ngx_brotli.git"
     version: "master"
 
 - name: (build) download latest nginx module headers_more
   get_url:
-    url: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
     dest: "/usr/src/headers-more-nginx-module-0.33.tar.gz"
+    url: "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz"
 
 - name: (build) unpack nginx module headers_more
   unarchive:
@@ -100,40 +100,40 @@
 
 - name: (build) Adding some Naxsi core rules from sources
   copy:
-    src: "/usr/src/naxsi/naxsi_config/naxsi_core.rules"
     dest: "/etc/nginx/naxsi_core.rules"
-    remote_src: true
-    owner: "root"
     group: "root"
     mode: u+rw,g-wx,o-wx
+    owner: "root"
+    remote_src: true
+    src: "/usr/src/naxsi/naxsi_config/naxsi_core.rules"
 
 - name: (sys) install logrotate
   apt:
+    install_recommends: false
     name: "logrotate"
     state: present
-    install_recommends: false
 
 - name: (sys) installing our nginx logrotate configuration
   template:
-    src: "templates/logrotate.nginx.j2"
     dest: "/etc/logrotate.d/nginx"
-    owner: "root"
     group: "root"
     mode: u+rw,g-wx,o-wx
+    owner: "root"
+    src: "templates/logrotate.nginx.j2"
 
 - name: (sys) installing our nginx configuration
   template:
-    src: "templates/nginx.conf.j2"
     dest: "/etc/nginx/nginx.conf"
-    owner: "root"
     group: "root"
     mode: u+rw,g-wx,o-wx
+    owner: "root"
+    src: "templates/nginx.conf.j2"
 
 - name: (sys) create needed folders for nginx configuration
   file:
+    mode: 0755
     path: "{{ item }}"
     state: directory
-    mode: 0755
   loop:
     - "/etc/nginx/sites-available"
     - "/etc/nginx/sites-enabled"
@@ -142,69 +142,69 @@
 
 - name: (sys) creating a default root folder for web apps
   file:
-    path: "/var/www/htdocs"
-    state: directory
+    group: "www-data"
     mode: 0755
     owner: "www-data"
-    group: "www-data"
+    path: "/var/www/htdocs"
+    state: directory
 
 - name: (sys) installing a basic nginx vhost
   template:
-    src: "templates/default.conf.j2"
     dest: "/etc/nginx/sites-available/default.conf"
-    owner: "root"
     group: "root"
     mode: u+rw,g-wx,o-wx
+    owner: "root"
+    src: "templates/default.conf.j2"
 
 - name: (sys) installing nginx status page vhost
   template:
-    src: "templates/status.conf.j2"
     dest: "/etc/nginx/sites-available/status.conf"
-    owner: "root"
     group: "root"
     mode: u+rw,g-wx,o-wx
+    owner: "root"
+    src: "templates/status.conf.j2"
 
 - name: Create a symbolic link
   file:
-    src: "/etc/nginx/sites-available/default.conf"
     dest: "/etc/nginx/sites-enabled/default.conf"
-    owner: "root"
     group: "root"
+    owner: "root"
+    src: "/etc/nginx/sites-available/default.conf"
     state: link
 
 - name: Create a symbolic link for status page
   file:
-    src: "/etc/nginx/sites-available/status.conf"
     dest: "/etc/nginx/sites-enabled/status.conf"
-    owner: "root"
     group: "root"
+    owner: "root"
+    src: "/etc/nginx/sites-available/status.conf"
     state: link
 
 - name: (sys) installing a basic html file
   template:
-    src: "templates/index.html.j2"
     dest: "/var/www/htdocs/index.html"
-    owner: "www-data"
     group: "www-data"
     mode: u+rw,g-wx,o-wx
+    owner: "www-data"
+    src: "templates/index.html.j2"
 
 - name: (build) cleaning sources
   args:
     warn: false
   shell: |
-    rm -fr /usr/src/nginx*
-    rm -fr /usr/src/openssl*
-    rm -fr /usr/src/ngx_brotli*
-    rm -fr /usr/src/naxsi*
     rm -fr /usr/src/headers-more-nginx*
+    rm -fr /usr/src/naxsi*
+    rm -fr /usr/src/nginx*
+    rm -fr /usr/src/ngx_brotli*
+    rm -fr /usr/src/openssl*
 
 - name: (sys) installing systemd unit
   template:
-    src: "templates/nginx.services.j2"
     dest: "/lib/systemd/system/nginx.service"
-    owner: "root"
     group: "root"
     mode: a+x
+    owner: "root"
+    src: "templates/nginx.services.j2"
 
 - name: start nginx
   systemd:
@@ -220,9 +220,9 @@
     state: absent
   loop:
     - build-essential
-    - libgeoip-dev
-    - libxslt1-dev
-    - libpcre3-dev
-    - zlib1g-dev
     - libbz2-dev
+    - libgeoip-dev
+    - libpcre3-dev
     - libssl-dev
+    - libxslt1-dev
+    - zlib1g-dev
