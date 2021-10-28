@@ -1,8 +1,0 @@
----
-- name: start nginx
-  systemd:
-    daemon_reload: true
-    enabled: true
-    masked: false
-    name: "nginx"
-    state: started

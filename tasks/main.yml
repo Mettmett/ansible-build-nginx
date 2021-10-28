@@ -205,7 +205,14 @@
     owner: "root"
     group: "root"
     mode: a+x
-  notify: start nginx
+
+- name: start nginx
+  systemd:
+    daemon_reload: true
+    enabled: true
+    masked: false
+    name: "nginx"
+    state: started
 
 - name: (sys) uninstall dev tools and libs
   apt:
